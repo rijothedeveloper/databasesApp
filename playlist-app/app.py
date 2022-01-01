@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
 
 from models import db, connect_db, Playlist, Song, PlaylistSong
@@ -10,7 +10,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 connect_db(app)
-db.create_all()
+# db.create_all()
 
 app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 
@@ -56,7 +56,16 @@ def add_playlist():
     - if valid: add playlist to SQLA and redirect to list-of-playlists
     """
 
-    # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    form = PlaylistForm()
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+        new_playlist = Playlist(name=name, description=description)
+        db.session.add(new_playlist)
+        db.session.commit()
+        flash("new playlist added")
+        return redirect("/")
+    return render_template("new_playlist.html", form=form)
 
 
 ##############################################################################
@@ -86,7 +95,19 @@ def add_song():
     - if valid: add playlist to SQLA and redirect to list-of-songs
     """
 
-    # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    form = SongForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        artist = form.artist.data
+        new_song = Song(title=title, artist=artist)
+        db.session.add(new_song)
+        db.session.commit()
+        flash("new song added")
+        return redirect("/")
+    else:
+        return render_template("new_song.html", form=form)
+        
+    
 
 
 @app.route("/playlists/<int:playlist_id>/add-song", methods=["GET", "POST"])
