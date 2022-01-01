@@ -17,30 +17,71 @@ Using the `movies_db` database, write the correct SQL queries for each of these 
 
 1.  The title of every movie.
 
+    \```sql
+    select title from movies;
+    \```
+
 2.  All information on the G-rated movies.
+
+    \```sql
+    select * from movies where rating='G';
+    \```
 
 3.  The title and release year of every movie, ordered with the
     oldest movie first.
+
+    \```sql
+    select title, release_year from movies order by release_year;
+    \```
     
 4.  All information on the 5 longest movies.
+
+    \```sql
+    select * from movies order by runtime desc limit 3;
+    \```
 
 5.  A query that returns the columns of `rating` and `total`, tabulating the
     total number of G, PG, PG-13, and R-rated movies.
 
+    \```sql
+    select rating, count(rating) from movies group by rating;
+    \```
+
 6.  A table with columns of `release_year` and `average_runtime`,
     tabulating the average runtime by year for every movie in the database. The data should be in reverse chronological order (i.e. the most recent year should be first).
+
+    \```sql
+    select release_year, avg(runtime) from movies group by release_year order by release_year desc;
+    \```
 
 7.  The movie title and studio name for every movie in the
     database.
 
+    \```sql
+    select title, name from movies join studios on studio_id=studios.id;
+    \```
+
 8.  The star first name, star last name, and movie title for every
     matching movie and star pair in the database.
 
+    \```sql
+    select first_name, last_name, title from stars join roles on stars.id=roles.star_id join movies on stars.id=movies.id;
+    \```
+
+
 9.  The first and last names of every star who has been in a G-rated movie. The first and last name should appear only once for each star, even if they are in several G-rated movies. *IMPORTANT NOTE*: it's possible that there can be two *different* actors with the same name, so make sure your solution accounts for that.
+
+    \```sql
+    select first_name, last_name from movies join roles on movies.id=roles.star_id join stars on roles.star_id=stars.id where movies.rating='G' group by stars.id;
+    \```
 
 10. The first and last names of every star along with the number
     of movies they have been in, in descending order by the number of movies. (Similar to #9, make sure
     that two different actors with the same name are considered separately).
+
+    \```sql
+    select first_name, last_name, count(movies.id) as no_of_movies from movies join roles on movies.id=roles.star_id join stars on roles.star_id=stars.id group by stars.id order by no_of_movies desc;
+    \```
 
 ### The rest of these are bonuses
 
