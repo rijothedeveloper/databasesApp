@@ -10,7 +10,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 connect_db(app)
-# db.create_all()
+# db.drop_all()
+db.create_all()
 
 app.config['SECRET_KEY'] = "I'LL NEVER TELL!!"
 
@@ -45,7 +46,8 @@ def show_all_playlists():
 def show_playlist(playlist_id):
     """Show detail on specific playlist."""
 
-    # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
+    playlist = Playlist.query.get(playlist_id)
+    return render_template("playlist.html", playlist=playlist)
 
 
 @app.route("/playlists/add", methods=["GET", "POST"])
@@ -120,18 +122,21 @@ def add_song_to_playlist(playlist_id):
 
     playlist = Playlist.query.get_or_404(playlist_id)
     form = NewSongForPlaylistForm()
-
-    # Restrict form to songs not already on this playlist
-
-    curr_on_playlist = ...
-    form.song.choices = ...
+    curr_on_playlist = [(song) for song in playlist.playlist_songs]
+    choices = [(song.id, song.title) for song in Song.query.all() if song not in curr_on_playlist]
+    form.song.choices = choices
 
     if form.validate_on_submit():
+        playlist_song = PlaylistSong(song_id=form.song.data,
+                                  playlist_id=playlist_id)
+        
+        db.session.add(playlist_song)
+        
+        
+        db.session.commit()
+        return redirect(f"/playlists/{playlist_id}")
 
-          # ADD THE NECESSARY CODE HERE FOR THIS ROUTE TO WORK
-
-          return redirect(f"/playlists/{playlist_id}")
-
+    
     return render_template("add_song_to_playlist.html",
                              playlist=playlist,
                              form=form)

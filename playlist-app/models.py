@@ -18,6 +18,8 @@ class Playlist(db.Model):
     
     description = db.Column(db.String,
                             nullable=False)
+    
+    playlist_songs = db.relationship('PlaylistSong', backref='playlists')
 
 
 class Song(db.Model):
@@ -34,6 +36,8 @@ class Song(db.Model):
     
     artist = db.Column(db.String,
                             nullable=False)
+    
+    playlist_songs = db.relationship('PlaylistSong', backref='songs')
 
 
 class PlaylistSong(db.Model):
@@ -51,9 +55,15 @@ class PlaylistSong(db.Model):
     song_id = db.Column(db.Integer,
                         db.ForeignKey('songs.id', ondelete="CASCADE"))
     
+    #constructor
+    def __init__(self, playlist_id=None, song_id=None):
+        self.playlist_id = playlist_id
+        self.song_id=song_id
+    
 # DO NOT MODIFY THIS FUNCTION
 def connect_db(app):
     """Connect to database."""
 
     db.app = app
     db.init_app(app)
+    
